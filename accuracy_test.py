@@ -7,14 +7,13 @@ from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler, normalize
 def divide_columns_by_max(dataframe):
     newFrame = []
     for row in np.array(dataframe.values).T:
         newFrame.append([(item*50.0)/max(row)*1.0 for item in row])
     return np.array(newFrame).T
 def accuracy_tests(TEST_NUMBER,test_train_subsets):
-    models = [["SVM",SVC(kernel='poly',degree=12),0],["LR",LogisticRegression(max_iter=1000),0],["ID3",DecisionTreeClassifier(),0],["NB",GaussianNB(),0],["KNN",KNeighborsClassifier(),0]]
+    models = [["SVM",SVC(kernel='poly',degree=1),0],["LR",LogisticRegression(max_iter=1000),0],["ID3",DecisionTreeClassifier(),0],["NB",GaussianNB(),0],["KNN",KNeighborsClassifier(),0]]
     # -----------Application of models on test samples---------------
     for model in models:
         for i in range(0,TEST_NUMBER):
@@ -32,10 +31,11 @@ def feature_selection_tests(dataset, number_of_features,test_train_subsets):
             model[2] += model[1].ranking_
     data_sets_feature_selected = []
     for feature_model in Feature_Models:
-        x = np.array([i for i in range(len(feature_model[2])) if (feature_model[2][i]==1)])
-        dt = dataset.transpose()
-        dt = dt.iloc[x]
-        dt = dt.transpose()
+        x = ([i for i in range(len(feature_model[2])) if (feature_model[2][i]==1)])
+        y = list(dataset.keys()[:-1][x])
+        y.append('Loan_Status')
+        #dataset = dataset[['LoanAmount','CoapplicantIncome','Property_Area','ApplicantIncome','Credit_History','Loan_Amount_Term','Loan_Status']]
+        dt = dataset[y]
         data_sets_feature_selected.append(divide_columns_by_max(dt))
 
     models = [["SVM",SVC(kernel='poly',degree=12)],["LR",LogisticRegression(max_iter=1000)],["NB",GaussianNB()],["KNN",KNeighborsClassifier()]]
